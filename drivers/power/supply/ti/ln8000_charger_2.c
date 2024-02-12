@@ -35,6 +35,7 @@
 #include <linux/sysfs.h>
 #include <linux/debugfs.h>
 #include <linux/types.h>
+#include <linux/hardware_info.h>
 //#include <linux/power/ln8000_charger.h>
 #include "ln8000_charger.h"
 #include "cp_qc30.h"
@@ -952,7 +953,7 @@ static int ln8000_charger_get_property(struct power_supply *psy,
         }
         break;
     case POWER_SUPPLY_PROP_MODEL_NAME:
-        val->strval = "bq2597x-master";
+        val->strval = "bq2597x-slave";
         break;
     default:
         return -EINVAL;
@@ -1535,7 +1536,7 @@ static int ln8000_psy_register(struct ln8000_info *info)
 {
     info->psy_cfg.drv_data = info;
     info->psy_cfg.of_node  = info->client->dev.of_node;
-    info->psy_desc.name 		= "bq2597x-master";
+    info->psy_desc.name 		= "bq2597x-slave";
     info->psy_desc.type 		= POWER_SUPPLY_TYPE_MAINS;
     info->psy_desc.properties	= ln8000_charger_props;
     info->psy_desc.num_properties = ARRAY_SIZE(ln8000_charger_props);
@@ -1646,7 +1647,7 @@ static int ln8000_probe(struct i2c_client *client, const struct i2c_device_id *i
     }
 
     determine_initial_status(info);
-    hardwareinfo_set_prop(HARDWARE_SUB_CHARGER_MASTER, "LN8000_CHARGER_MASTER");
+    hardwareinfo_set_prop(HARDWARE_SUB_CHARGER_SLAVE, "LN8000_CHARGER_SLAVE");
 
     return 0;
 
@@ -1740,7 +1741,7 @@ static const struct dev_pm_ops ln8000_pm_ops = {
 
 static struct i2c_driver ln8000_driver = {
     .driver   = {
-        .name = "ln8000_charger",
+        .name = "ln8000_charger_2",
         .owner = THIS_MODULE,
         .of_match_table = of_match_ptr(ln8000_dt_match),
 #if defined(CONFIG_PM)
