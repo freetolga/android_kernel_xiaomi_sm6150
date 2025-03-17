@@ -1392,33 +1392,7 @@ static int bpf_prog_attach_check_attach_type(const struct bpf_prog *prog,
 
 /* last field in 'union bpf_attr' used by this command */
 #define	BPF_PROG_LOAD_LAST_FIELD prog_name
-=======
-/* Initially all BPF programs could be loaded w/o specifying
- * expected_attach_type. Later for some of them specifying expected_attach_type
- * at load time became required so that program could be validated properly.
- * Programs of types that are allowed to be loaded both w/ and w/o (for
- * backward compatibility) expected_attach_type, should have the default attach
- * type assigned to expected_attach_type for the latter case, so that it can be
- * validated later at attach time.
- *
- * bpf_prog_load_fixup_attach_type() sets expected_attach_type in @attr if
- * prog type requires it but has some attach types that have to be backward
- * compatible.
- */
-static void bpf_prog_load_fixup_attach_type(union bpf_attr *attr)
-{
-	switch (attr->prog_type) {
-	case BPF_PROG_TYPE_CGROUP_SOCK:
-		/* Unfortunately BPF_ATTACH_TYPE_UNSPEC enumeration doesn't
-		 * exist so checking for non-zero is the way to go here.
-		 */
-		if (!attr->expected_attach_type)
-			attr->expected_attach_type =
-				BPF_CGROUP_INET_SOCK_CREATE;
-		break;
-	}
-}
->>>>>>> phoenix/android-4.14-phoenix
+
 
 static int
 bpf_prog_load_check_attach_type(enum bpf_prog_type prog_type,
