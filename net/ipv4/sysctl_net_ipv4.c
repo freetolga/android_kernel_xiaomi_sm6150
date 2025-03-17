@@ -1147,8 +1147,6 @@ static struct ctl_table ipv4_net_table[] = {
 		.proc_handler   = proc_dointvec_minmax,
 		.extra1		= &three,
 		.extra2		= &hundred,
-=======
->>>>>>> phoenix/android-4.14-phoenix
 	},
 	{ }
 };
