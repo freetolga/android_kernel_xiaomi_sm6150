@@ -3514,7 +3514,11 @@ static void perf_adjust_period(struct perf_event *event, u64 nsec, u64 count, bo
 	period = perf_calculate_period(event, nsec, count);
 
 	delta = (s64)(period - hwc->sample_period);
-	delta = (delta + 7) / 8; /* low pass filter */
+	if (delta >= 0)
+		delta += 7;
+	else
+		delta -= 7;
+	delta /= 8; /* low pass filter */
 
 	sample_period = hwc->sample_period + delta;
 
@@ -5095,6 +5099,8 @@ static long _perf_ioctl(struct perf_event *event, unsigned int cmd, unsigned lon
 		rcu_read_unlock();
 		return 0;
 	}
+	case PERF_EVENT_IOC_QUERY_BPF:
+		return perf_event_query_prog_array(event, (void __user *)arg);
 	default:
 		return -ENOTTY;
 	}
@@ -7096,7 +7102,7 @@ static void perf_fill_ns_link_info(struct perf_ns_link_info *ns_link_info,
 {
 	struct path ns_path;
 	struct inode *ns_inode;
-	void *error;
+	int error;
 
 	error = ns_get_path(&ns_path, task, ns_ops);
 	if (!error) {
@@ -10489,12 +10495,12 @@ SYSCALL_DEFINE5(perf_event_open,
 	if (flags & ~PERF_FLAG_ALL)
 		return -EINVAL;
 
-	/* Do we allow access to perf_event_open(2) ? */
-	err = security_perf_event_open(&attr, PERF_SECURITY_OPEN);
+	err = perf_copy_attr(attr_uptr, &attr);
 	if (err)
 		return err;
 
-	err = perf_copy_attr(attr_uptr, &attr);
+	/* Do we allow access to perf_event_open(2) ? */
+	err = security_perf_event_open(&attr, PERF_SECURITY_OPEN);
 	if (err)
 		return err;
 
