@@ -408,7 +408,7 @@ And public attribution of xiaomi platforms(like F3 and so and)
 	};
 
 	bq25970-standalone@66 {
-		compatible = "ti,bq2597x-master";
+		compatible = "ti,bq2597x-standalone";
 		reg = <0x66>;
 
 		interrupt-parent = <&tlmm>;
